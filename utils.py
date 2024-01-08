@@ -11,18 +11,25 @@ def get_gsheet_connection():
 
 
 def get_player_list(conn: GSheetsConnection) -> list:
-    players = conn.read(worksheet="Players", usecols=[0], nrows=40)
+    players = conn.read(worksheet="Players", usecols=[0], nrows=100)
     players = players.query("name.notnull()")["name"].tolist()
     return sorted(players)
 
 
 def get_match_data(conn: GSheetsConnection) -> pd.DataFrame:
     match_data = conn.read(
-        worksheet="game_data", usecols=range(len(column_names)), nrows=400
+        worksheet="game_data", usecols=range(len(column_names)), nrows=4000
     )
     match_data["date"] = pd.to_datetime(match_data["date"])
     match_data = match_data.query("name.notnull()")
     return match_data
+
+
+def get_funds(conn: GSheetsConnection) -> pd.DataFrame:
+    funds_data = conn.read(worksheet="funds", usecols=range(3), nrows=400)
+    funds_data["date"] = pd.to_datetime(funds_data["date"])
+    funds_data = funds_data.query("amount.notnull()")
+    return funds_data
 
 
 def get_empty_team_sheet(match_date: pd.Timestamp) -> pd.DataFrame:

@@ -96,6 +96,12 @@ with st.form("edit_form"):
             st.error("Team A contains duplicate players")
         elif team_b_players_edit["name"].duplicated().any():
             st.error("Team B contains duplicate players")
+        elif (
+            pd.concat([team_a_players_edit, team_b_players_edit])["name"]
+            .duplicated()
+            .any()
+        ):
+            st.error("The same player appears for both teams")
         elif team_a_score < team_a_players_edit["goals"].sum():
             "Team A score must be greater than or equal to the sum of goals"
         elif team_b_score < team_b_players_edit["goals"].sum():
