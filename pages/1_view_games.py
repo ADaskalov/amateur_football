@@ -225,6 +225,7 @@ for data, ax, colour, name in zip(
     for label in ax.get_yticklabels():
         label.set(fontsize=13)
     ax.set_facecolor("white")
+sns.despine(stats_fig, left=True, bottom=True)
 stats_axes[0].set(yticks=labels, yticklabels=labels)
 
 plt.subplots_adjust(wspace=0, top=0.85, bottom=0.1, left=0.18, right=0.95)

@@ -78,6 +78,4 @@ sns.heatmap(
 )
 ax.tick_params(bottom=False, left=False)
 
-
-print(heatmap_data)
 st.write(fig)
