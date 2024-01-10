@@ -7,7 +7,7 @@ column_names = ["date", "team", "name", "goals"]
 
 @st.cache_resource
 def get_gsheet_connection():
-    return st.connection("gsheets", type=GSheetsConnection)
+    return st.connection("gsheets", type=GSheetsConnection)  # type: ignore
 
 
 def get_player_list(conn: GSheetsConnection) -> list:
@@ -59,7 +59,7 @@ def enrich_team_sheet(
         other_goals >= 0
     ), f"Total goals {total_goals} is less than sum of goals {team_sheet_df['goals'].sum()}"
     other_row = pd.Series({"name": "Other", "goals": other_goals})
-    team_sheet_df = team_sheet_df.append(other_row, ignore_index=True)
+    team_sheet_df = team_sheet_df.append(other_row, ignore_index=True)  # type: ignore
     team_sheet_df["date"] = pd.to_datetime(match_date)
     team_sheet_df["team"] = team
     team_sheet_df["goals"] = team_sheet_df["goals"].fillna(0).astype(int)

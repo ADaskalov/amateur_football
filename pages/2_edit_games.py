@@ -20,11 +20,16 @@ players = utils.get_player_list(conn)
 match_data = utils.get_match_data(conn)
 
 
-thursdays = pd.date_range("2023-10-01", pd.Timestamp.now(), freq="W-THU")
+thursdays = pd.date_range(
+    "2023-10-01", pd.Timestamp.now() + pd.DateOffset(days=6), freq="W-THU"
+)
 match_date = st.selectbox(
     "Select match date", map(lambda t: t.date(), sorted(thursdays, reverse=True))
 )
-team_a_players, team_b_players = utils.get_players_per_team(match_data, match_date)
+assert match_date is not None, "No match date selected"
+team_a_players, team_b_players = utils.get_players_per_team(
+    match_data, pd.to_datetime(match_date)
+)
 team_a, team_b = st.columns(2, gap="medium")
 with st.form("edit_form"):
     with team_a:
@@ -45,7 +50,7 @@ with st.form("edit_form"):
                     "Name",
                     help="Name of the player",
                     width="medium",
-                    options=set(players),
+                    options=players,
                     required=True,
                 ),
                 "goals": st.column_config.NumberColumn(
@@ -97,7 +102,7 @@ with st.form("edit_form"):
         elif team_b_players_edit["name"].duplicated().any():
             st.error("Team B contains duplicate players")
         elif (
-            pd.concat([team_a_players_edit, team_b_players_edit])["name"]
+            pd.concat([team_a_players_edit, team_b_players_edit], axis=0)["name"]
             .duplicated()
             .any()
         ):
@@ -110,13 +115,14 @@ with st.form("edit_form"):
             team_sheets = pd.concat(
                 [
                     utils.enrich_team_sheet(
-                        team_a_players_edit, match_date, "A", team_a_score
-                    ),
+                        team_a_players_edit, pd.Timestamp(match_date), "A", team_a_score
+                    ).squeeze(),
                     utils.enrich_team_sheet(
-                        team_b_players_edit, match_date, "B", team_b_score
-                    ),
+                        team_b_players_edit, pd.Timestamp(match_date), "B", team_b_score
+                    ).squeeze(),
                 ],
                 ignore_index=True,
+                axis=0,
             )
             utils.upload_team_sheet(conn, team_sheets)
             st.success("Match data updated successfully")

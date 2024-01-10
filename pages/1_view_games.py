@@ -2,6 +2,7 @@ import random
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import streamlit as st
 from matplotlib import colormaps
@@ -35,6 +36,7 @@ match_date = st.selectbox(
     match_data["date"].unique(),
     format_func=lambda dt: np.datetime_as_string(dt, unit="D"),
 )
+assert match_date is not None, "No match date selected"
 team_a_players, team_b_players = utils.get_players_per_team(match_data, match_date)
 team_a, team_b = st.columns(2, gap="medium")
 with team_a:
@@ -58,21 +60,23 @@ with team_b:
         st.write(f"{r['name']} {'⚽' * int(r['goals'])}")
 
 # Pretty graphs bit
-parser = Sbopen()
+parser = Sbopen(dataframe=True)
 
 
 @st.cache_data
-def get_match_stats(match_id):
-    return parser.event(match_id)
+def get_match_stats(
+    match_id: int,
+) -> tuple[pd.DataFrame, pd.DataFrame | None, pd.DataFrame, pd.DataFrame]:
+    return parser.event(match_id)  # type: ignore
 
 
 @st.cache_data
-def get_matches(competition_id, season_id):
-    return parser.match(competition_id=competition_id, season_id=season_id)
+def get_matches(competition_id: int, season_id: int) -> pd.DataFrame:
+    return parser.match(competition_id=competition_id, season_id=season_id)  # type: ignore
 
 
 @st.cache_data
-def get_competitions():
+def get_competitions() -> pd.DataFrame:
     return parser.competition()
 
 
@@ -184,7 +188,6 @@ def create_statistics(shot_df):
     all_shots = outcomes.sum()
     goals = outcomes.Goal if hasattr(outcomes, "Goal") else 0
     saves = outcomes.Saved if hasattr(outcomes, "Saved") else 0
-    post = outcomes.Post if hasattr(outcomes, "Post") else 0
     on_target = saves + goals
     off_target = all_shots - on_target
     blocked = outcomes.Blocked if hasattr(outcomes, "Blocked") else 0
