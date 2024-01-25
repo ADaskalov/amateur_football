@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 
-column_names = ["date", "team", "name", "goals"]
+column_names = ["date", "team", "name", "goals", "assists"]
 
 
 @st.cache_resource
@@ -33,9 +33,12 @@ def get_funds(conn: GSheetsConnection) -> pd.DataFrame:
 
 
 def get_empty_team_sheet(match_date: pd.Timestamp) -> pd.DataFrame:
-    team_sheet = pd.DataFrame(index=range(6), columns=["name", "goals", "date"])
+    team_sheet = pd.DataFrame(
+        index=range(6), columns=["name", "goals", "date", "assists"]
+    )
     team_sheet["date"] = match_date
     team_sheet["goals"] = 0
+    team_sheet["assists"] = 0
     return team_sheet
 
 
@@ -63,6 +66,7 @@ def enrich_team_sheet(
     team_sheet_df["date"] = pd.to_datetime(match_date)
     team_sheet_df["team"] = team
     team_sheet_df["goals"] = team_sheet_df["goals"].fillna(0).astype(int)
+    team_sheet_df["assists"] = team_sheet_df["assists"].fillna(0).astype(int)
     team_sheet_df["total_goals"] = total_goals
     return team_sheet_df
 

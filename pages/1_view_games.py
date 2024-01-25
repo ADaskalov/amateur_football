@@ -47,7 +47,8 @@ with team_a:
         label_visibility="hidden",
     )
     for i, r in team_a_players.iterrows():
-        st.write(f"{'⚽' * int(r['goals'])} {r['name']}")
+        st.write(f"{'⚽' * int(r['goals'])} {'🅰️' * int(r['assists'])} {r['name']}")
+
 
 with team_b:
     st.subheader("Отбор Черешка")
@@ -57,7 +58,7 @@ with team_b:
         label_visibility="hidden",
     )
     for i, r in team_b_players.iterrows():
-        st.write(f"{r['name']} {'⚽' * int(r['goals'])}")
+        st.write(f"{r['name']} {'⚽' * int(r['goals'])} {'🅰️' * int(r['assists'])}")
 
 # Pretty graphs bit
 parser = Sbopen(dataframe=True)

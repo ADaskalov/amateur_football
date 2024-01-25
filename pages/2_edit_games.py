@@ -44,7 +44,7 @@ with st.form("edit_form"):
         )
 
         team_a_players_edit = st.data_editor(
-            team_a_players.query('name!="Other"')[["name", "goals"]],
+            team_a_players.query('name!="Other"')[["name", "goals", "assists"]],
             column_config={
                 "name": st.column_config.SelectboxColumn(
                     "Name",
@@ -56,6 +56,13 @@ with st.form("edit_form"):
                 "goals": st.column_config.NumberColumn(
                     "Goals",
                     help="Number of goals",
+                    min_value=0,
+                    step=1,
+                    required=True,
+                ),
+                "assists": st.column_config.NumberColumn(
+                    "Assists",
+                    help="Number of assists",
                     min_value=0,
                     step=1,
                     required=True,
@@ -76,18 +83,25 @@ with st.form("edit_form"):
             label_visibility="collapsed",
         )
         team_b_players_edit = st.data_editor(
-            team_b_players.query('name!="Other"')[["name", "goals"]],
+            team_b_players.query('name!="Other"')[["name", "goals", "assists"]],
             column_config={
                 "name": st.column_config.SelectboxColumn(
                     "Name",
                     help="Name of the player",
                     width="medium",
-                    options=set(players),
+                    options=players,
                     required=True,
                 ),
                 "goals": st.column_config.NumberColumn(
                     "Goals",
                     help="Number of goals",
+                    min_value=0,
+                    step=1,
+                    required=True,
+                ),
+                "assists": st.column_config.NumberColumn(
+                    "Assists",
+                    help="Number of assists",
                     min_value=0,
                     step=1,
                     required=True,
