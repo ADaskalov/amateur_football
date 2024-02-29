@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import streamlit as st
+from matplotlib.colors import LinearSegmentedColormap
 
 import utils
 
@@ -20,6 +21,8 @@ st.markdown(
 )
 conn = utils.get_gsheet_connection()
 match_data = utils.get_match_data(conn)
+match_data = utils.get_match_outcome(match_data)
+match_data["sign"] = match_data["sign"].map({"W": 1, "L": -1, "D": 0})
 
 starting_point = st.radio(
     "Стартова дата",
@@ -60,19 +63,21 @@ st.dataframe(
 heatmap_data = (
     match_data.query("date >= @start_date and name != 'Other'")
     .groupby(["name", "date"])
-    .agg({"team": "count"})["team"]
+    .agg({"sign": "sum"})["sign"]
     .unstack()
-    .fillna(0)
 )
+
 heatmap_data.index.name = None
 heatmap_data.columns = np.datetime_as_string(heatmap_data.columns, unit="D")
 
 fig, ax = plt.subplots(figsize=(20, 10))
+myColors = [(1, 0.5, 0.5), (0.8, 0.8, 0.8), (0.4, 0.8, 0.5)]
 sns.heatmap(
     heatmap_data,
-    cmap=sns.cubehelix_palette(start=2, rot=0, dark=0.75, light=1, as_cmap=True),
-    vmin=0,
-    vmax=1,
+    # cmap=sns.cubehelix_palette(start=2, rot=0, dark=0.75, light=1, as_cmap=True),
+    # vmin=0,
+    # vmax=1,
+    cmap=LinearSegmentedColormap.from_list("Custom", myColors, len(myColors)),
     cbar=False,
     ax=ax,
 )

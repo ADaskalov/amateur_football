@@ -32,6 +32,18 @@ def get_funds(conn: GSheetsConnection) -> pd.DataFrame:
     return funds_data
 
 
+def get_match_outcome(match_data: pd.DataFrame) -> pd.DataFrame:
+    md = match_data.query('date>"2024-01-01"').copy()
+    res = md.groupby(["date", "team"])["goals"].sum().unstack()
+    res["outcome"] = res["A"] - res["B"]
+    md["outcome"] = md["date"].map(res["outcome"])
+    md["sign"] = md["outcome"].map(lambda x: "W" if x > 0 else "L" if x < 0 else "D")
+    md.loc[md["team"] == "B", "sign"] = md.loc[md["team"] == "B", "sign"].map(
+        lambda x: "W" if x == "L" else "L" if x == "W" else "D"
+    )
+    return md
+
+
 def get_empty_team_sheet(match_date: pd.Timestamp) -> pd.DataFrame:
     team_sheet = pd.DataFrame(
         index=range(6), columns=["name", "goals", "date", "assists"]
