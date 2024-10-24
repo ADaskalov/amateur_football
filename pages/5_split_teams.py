@@ -53,7 +53,12 @@ if st.checkbox("Show raw data", value=False):
 
 
 def split_teams(list_of_players: list, player_ratings: pd.Series) -> pd.Series:
-    players_to_choose_from = player_ratings.loc[list_of_players].copy()
+    try:
+        players_to_choose_from = player_ratings.loc[list_of_players].copy()
+    except KeyError:
+        missing_players = set(list_of_players).difference(set(player_ratings))
+        st.write(f"These are missing {missing_players}")
+        return pd.Series(dtype = int)
     results = dict()
     for team_split in range(2**11):
         if team_split.bit_count() == 6:
