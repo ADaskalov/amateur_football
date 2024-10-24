@@ -56,7 +56,7 @@ def split_teams(list_of_players: list, player_ratings: pd.Series) -> pd.Series:
     try:
         players_to_choose_from = player_ratings.loc[list_of_players].copy()
     except KeyError:
-        missing_players = set(list_of_players).difference(set(player_ratings))
+        missing_players = set(list_of_players).difference(set(player_ratings.index))
         st.write(f"These are missing {missing_players}")
         return pd.Series(dtype = int)
     results = dict()
